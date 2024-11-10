@@ -4,11 +4,43 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Defines
 def initialize_maze(width, height):
+    # Functionality:
+    # - Initializes the maze grid with 1s which represent walls
+
+    # Parameters:
+    # - width (int): the width of the maze (# of columns)
+    # - height (int): the height of the maze (# of rows)
+
+    # Returns:
+    # - list of lists: a 2d grid that represents the maze, with each cell being initialized with 1, indicating a wall
+
+    # Example:
+    # initialize_maze(11, 11) # returns a 11x11 grid filled with 1s
     return [[1 for _ in range(width)] for _ in range(height)]
 
 def carve_maze(start_x, start_y, end_x, end_y, maze, width, height):
+    # Functionality
+    # - Carves paths into the maze grid using Depth-First Search (DFS)
+    # - Randomly shuffles directions to create randomized maze patterns
+    # - Directions have a magnitude of 2, allowing more walls between paths
+
+    # Parameters:
+    # - start_x (int): the x-coordinate of the starting cell
+    # - start_y (int): the y-coordinate of the starting cell
+    # - end_x (int): the x-coordinate of the ending cell
+    # - end_y (int): the y-coordinate of the ending cell
+    # - maze (list of lists): a 2d grid where cells are 0 (for path) or 1 (for wall)
+
+    # Modifies:
+    # - the `maze` grid by marking visited cells as paths (0) 
+
+    # Returns:
+    # - None: the function modifies the maze by setting cells as part of the path
+
+    # Example:
+    # - carve_maze(1, 1, maze, maze, 8, 8)
+
     stack = [(start_x, start_y)]  # start with the initial position in the stack
     maze[start_y][start_x] = 0  # mark the starting point as part of the path
 
@@ -37,6 +69,20 @@ def carve_maze(start_x, start_y, end_x, end_y, maze, width, height):
             stack.pop()
 
 def generate_maze(start_x, start_y, width, height):
+    # Functionality
+    # - Generates a complete maze by initializing the grid and carving paths
+
+    # Parameters
+    # - width (int): the width of the maze (# of columns)
+    # - height (int): the height of the maze (# of rows)
+
+    # Returns:
+    # maze (list of list): a 2d grid where cells are 0 (for path) or 1 (for wall)
+
+    # Example
+    # - maze = generate_maze(10, 10)
+
+
     maze = initialize_maze(width, height)
     carve_maze(start_x, start_y, end_x, end_y, maze, width, height)
     return maze
