@@ -17,6 +17,14 @@ def initialize_maze(width, height):
 
     # Example:
     # initialize_maze(11, 11) # returns a 11x11 grid filled with 1s
+    
+    # Ensure dimensions are odd to allow for proper boundaries
+    if width % 2 == 0:
+        width += 1
+
+    if height % 2 == 0:
+        height += 1
+    
     return [[1 for _ in range(width)] for _ in range(height)]
 
 def carve_maze(start_x, start_y, end_x, end_y, maze, width, height):
@@ -92,8 +100,8 @@ def visualize_maze(maze):
     plt.imshow(maze_array, cmap="gray_r")
     plt.show()
 
-width = int(input("Enter the width (preferably, an odd number) of the maze: "))
-height = int(input("Enter the (preferably, an odd number) height of the maze: "))
+width = int(input("Enter the width of the maze: "))
+height = int(input("Enter the height of the maze: "))
 
 start_x = int(input("Enter the starting x-coordinate for the maze: "))
 start_y = int(input("Enter the starting y-coordinate for the maze: "))
