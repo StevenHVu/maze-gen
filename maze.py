@@ -19,7 +19,7 @@ def initialize_maze(width, height):
     - initialize_maze(11, 11) # returns a 11x11 grid filled with 1s
     """
     
-    # Ensure dimensions are odd to allow for proper boundaries
+    # ensure dimensions are odd to allow for proper boundaries
     if width % 2 == 0:
         width += 1  # if width is even, make it odd
     if height % 2 == 0:
@@ -206,7 +206,7 @@ def dijkstra(start, end, maze, width, height):
     
     return distances, path  # return the distances dictionary and the shortest path
 
-def visualize_maze(maze, width, height, shortest_path, distances):
+def visualize_maze(maze, width, height, shortest_path, distances, show_distances_flag='1'):
     """
     Visualizes the maze and overlays the shortest path and distance values.
 
@@ -233,29 +233,61 @@ def visualize_maze(maze, width, height, shortest_path, distances):
     plt.imshow(maze_array, cmap=cmap, origin="upper")  # display the maze
 
     # dynamically determine font size based on the maze size
-    fontsize = max(8, 150 // max(height, width))
+    fontsize = min(18, 250 // max(height, width))
+    print(f"fontsize: ", fontsize)
 
-    # overlay distance values on the path and shortest path cells
-    for x in range(height):
-        for y in range(width):
-            if maze[x][y] == 0 or maze_with_path[x][y] == 2:  # check if it's part of the path
-                if (x, y) in distances:  # check if the distance is available
-                    dist_value = distances[(x, y)]  # get the distance
-                    if dist_value < float('inf'):  # avoid infinite distances
-                        color = "black" if maze_with_path[x][y] != 2 else "white"  # choose text color
-                        plt.text(y, x, f"{dist_value:.0f}", ha='center', va='center', fontsize=fontsize, color=color)
-    
+    if show_distances_flag:
+        # overlay distance values on the path and shortest path cells
+        for x in range(height):
+            for y in range(width):
+                if maze[x][y] == 0 or maze_with_path[x][y] == 2:  # check if it's part of the path
+                    if (x, y) in distances:  # check if the distance is available
+                        dist_value = distances[(x, y)]  # get the distance
+                        if dist_value < float('inf'):  # avoid infinite distances
+                            color = "black" if maze_with_path[x][y] != 2 else "white"  # choose text color
+                            plt.text(y, x, f"{dist_value:.0f}", ha='center', va='center', fontsize=fontsize, color=color)
+        
+    figure = plt.gcf()  # get current figure
+    figure.set_size_inches(18, 10)
+    plt.axis('off')
     plt.show()  # display the plot
 
 def main():
-    width = 11
-    height = 11
-    start = (1, 1)
-    end = (height - 2, width - 2)
+    user_input = input ("Enter '0' for default small maze, '1' for default large maze, '2' for custom maze: ")
+    if user_input == '0':
+        width = 11
+        height = 11
+        start = (1, 1)
+        end = (height - 2, width - 2)
 
-    maze = generate_maze(start, end, width, height)
-    distances, shortest_path = dijkstra(start, end, maze, width, height)
-    visualize_maze(maze, width, height, shortest_path, distances)
+        maze = generate_maze(start, end, width, height)
+        distances, shortest_path = dijkstra(start, end, maze, width, height)
+        visualize_maze(maze, width, height, shortest_path, distances)
+    if user_input == '1':
+        width = 50
+        height = 50
+        start = (1, 1)
+        end = (height - 1, width - 1)
+
+        maze = generate_maze(start, end, width, height)
+        distances, shortest_path = dijkstra(start, end, maze, width, height)
+        visualize_maze(maze, width, height, shortest_path, distances)
+    elif user_input == '2':
+        width = int(input("Enter width value: "))
+        height = int(input("Enter height value: "))
+        start_x = int(input("Enter starting x-coordinate: "))
+        start_y = int(input("Enter starting y-coordinate: "))
+        start = (start_y, start_x)
+        end_x = int(input("Enter end point x-coordinate: "))
+        end_y = int(input("Enter end point y-coordinate: "))
+        end = (end_x, end_y)
+        
+        show_distances_flag = int(input("Would you like to display the distances from the source on every path cell? Enter '0' for no display."))
+        maze = generate_maze(start, end, width, height)
+        distances, shortest_path = dijkstra(start, end, maze, width, height)
+        visualize_maze(maze, width, height, shortest_path, distances, show_distances_flag)
+    else: 
+        print(f"Please enter a valid, positive integer into these fields and try again.")
 
 if __name__ == "__main__":
     main()
