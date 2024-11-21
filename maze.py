@@ -22,8 +22,11 @@ def initialize_maze(width, height):
     # ensure dimensions are odd to allow for proper boundaries
     if width % 2 == 0:
         width += 1  # if width is even, make it odd
+        print(f"Width of the maze has been changed to {width - 2}")
     if height % 2 == 0:
         height += 1  # if height is even, make it odd
+        print(f"Height of the maze has been changed to {height - 2}")
+
     
     # return a 2d grid (list of lists) where each cell is initialized to 1 (wall)
     return [[1 for _ in range(width)] for _ in range(height)]
@@ -108,7 +111,15 @@ def carve_maze(start, end, maze, width, height):
             stack.pop()
 
     # make sure the endpoint is connected to the maze
-    if check_point_condition != 3:
+    if check_point_condition(start, maze, width, height) != 3:
+        random.shuffle(directions)  # shuffle directions for randomness
+        for dx, dy in directions:
+            nx, ny = start[1] + dx, start[0] + dy  # check surrounding cells of the start point
+            if 0 < nx < width and 0 < ny < height and maze[ny][nx] == 0:
+                maze[start[0] + dy // 2][start[1] + dx // 2] = 0  # carve the wall between current and new position
+
+    # make sure the endpoint is connected to the maze
+    if check_point_condition(end, maze, width, height) != 3:
         random.shuffle(directions)  # shuffle directions for randomness
         for dx, dy in directions:
             nx, ny = end[1] + dx, end[0] + dy  # check surrounding cells of the endpoint
@@ -234,7 +245,6 @@ def visualize_maze(maze, width, height, shortest_path, distances, show_distances
 
     # dynamically determine font size based on the maze size
     fontsize = min(18, 250 // max(height, width))
-    print(f"fontsize: ", fontsize)
 
     if show_distances_flag:
         # overlay distance values on the path and shortest path cells
@@ -253,19 +263,19 @@ def visualize_maze(maze, width, height, shortest_path, distances, show_distances
     plt.show()  # display the plot
 
 def main():
-    user_input = input ("Enter '0' for default small maze, '1' for default large maze, '2' for custom maze: ")
+    user_input = input ("Enter '0' for default 11x11 maze, '1' for default 51x51 maze, '2' for custom maze: ")
     if user_input == '0':
-        width = 11
-        height = 11
+        width = 12
+        height = 12
         start = (1, 1)
-        end = (height - 2, width - 2)
+        end = (height - 1, width - 1)
 
         maze = generate_maze(start, end, width, height)
         distances, shortest_path = dijkstra(start, end, maze, width, height)
         visualize_maze(maze, width, height, shortest_path, distances)
     if user_input == '1':
-        width = 50
-        height = 50
+        width = 52
+        height = 52
         start = (1, 1)
         end = (height - 1, width - 1)
 
@@ -273,16 +283,31 @@ def main():
         distances, shortest_path = dijkstra(start, end, maze, width, height)
         visualize_maze(maze, width, height, shortest_path, distances)
     elif user_input == '2':
-        width = int(input("Enter width value: "))
-        height = int(input("Enter height value: "))
-        start_x = int(input("Enter starting x-coordinate: "))
-        start_y = int(input("Enter starting y-coordinate: "))
+        width = int(input("Enter width value: ")) + 2
+        height = int(input("Enter height value: ")) + 2
+
+        start_x = ''
+        start_y = ''
+        end_x = ''
+        end_y = ''
+        if (width % 2 == 0):
+            start_x = int(input("Enter starting x-coordinate [1, width + 1]: ")) + 1
+            end_x = int(input("Enter end point x-coordinate [1, width + 1]: ")) + 1
+        else:
+            start_x = int(input("Enter starting x-coordinate [1, width]: "))
+            end_x = int(input("Enter end point x-coordinate [1, width]: "))
+
+        if (height % 2 == 0):
+            start_y = int(input("Enter starting y-coordinate [1, height + 1]: ")) + 1
+            end_y = int(input("Enter end point y-coordinate [1, height + 1]: ")) + 1
+        else:
+            start_y = int(input("Enter starting y-coordinate [1, height]: "))
+            end_y = int(input("Enter end point y-coordinate [1, height]: "))
+
         start = (start_y, start_x)
-        end_x = int(input("Enter end point x-coordinate: "))
-        end_y = int(input("Enter end point y-coordinate: "))
-        end = (end_x, end_y)
-        
-        show_distances_flag = int(input("Would you like to display the distances from the source on every path cell? Enter '0' for no display."))
+        end = (end_y, end_x)
+
+        show_distances_flag = int(input("Display distances? Enter '0' for no display, '1' to display: "))
         maze = generate_maze(start, end, width, height)
         distances, shortest_path = dijkstra(start, end, maze, width, height)
         visualize_maze(maze, width, height, shortest_path, distances, show_distances_flag)
